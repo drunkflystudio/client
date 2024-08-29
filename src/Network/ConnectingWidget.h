@@ -6,7 +6,7 @@
 
 class Server;
 
-class ConnectingWidget : public QWidget
+class ConnectingWidget final : public QWidget
 {
     Q_OBJECT
 

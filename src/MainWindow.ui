@@ -16,7 +16,58 @@
    </iconset>
   </property>
   <widget class="QStackedWidget" name="centralWidget">
-   <widget class="QWidget" name="contents"/>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QSplitter" name="contents">
+    <property name="orientation">
+     <enum>Qt::Orientation::Vertical</enum>
+    </property>
+    <widget class="QTabWidget" name="editorTabs">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="documentMode">
+      <bool>true</bool>
+     </property>
+     <property name="tabsClosable">
+      <bool>true</bool>
+     </property>
+     <property name="movable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QTabWidget" name="bottomTabs">
+     <property name="tabPosition">
+      <enum>QTabWidget::TabPosition::West</enum>
+     </property>
+     <property name="tabShape">
+      <enum>QTabWidget::TabShape::Rounded</enum>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <property name="usesScrollButtons">
+      <bool>false</bool>
+     </property>
+     <property name="documentMode">
+      <bool>false</bool>
+     </property>
+     <widget class="AssetBrowser" name="assetBrowser">
+      <attribute name="title">
+       <string>Assets</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="consolePanel">
+      <attribute name="title">
+       <string>Console</string>
+      </attribute>
+     </widget>
+    </widget>
+   </widget>
    <widget class="ConnectingWidget" name="connectingWidget"/>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -36,6 +87,12 @@
    <class>ConnectingWidget</class>
    <extends>QWidget</extends>
    <header>Network/ConnectingWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AssetBrowser</class>
+   <extends>QWidget</extends>
+   <header>AssetBrowser/AssetBrowser.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

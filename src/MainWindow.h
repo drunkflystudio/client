@@ -7,7 +7,7 @@
 class Server;
 class ConnectingWidget;
 
-class MainWindow : public QMainWindow
+class MainWindow final : public QMainWindow
 {
     Q_OBJECT
 
@@ -18,6 +18,8 @@ public:
 private:
     Ui_MainWindow m_ui;
     Server* m_server;
+
+    void updateTitle();
 
     void onServerStateChanged();
 

@@ -1,5 +1,8 @@
 <RCC>
   <qresource>
     <file>drunkfly.ico</file>
+    <file>tango/32x32/actions/go-next.png</file>
+    <file>tango/32x32/actions/go-previous.png</file>
+    <file>tango/32x32/actions/go-up.png</file>
   </qresource>
 </RCC>

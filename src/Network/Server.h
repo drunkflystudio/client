@@ -5,7 +5,7 @@
 
 class QTimer;
 
-class Server : public QObject
+class Server final : public QObject
 {
     Q_OBJECT
 
