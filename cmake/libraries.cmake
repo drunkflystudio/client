@@ -28,8 +28,16 @@ macro(qt_install_win32_plugins config targetDir libFile)
         set(name "${plugin}${suffix}.dll")
         set(file "${path}/plugins/${name}")
         if(EXISTS "${file}" AND NOT EXISTS "${targetDir}/${name}")
-            message(STATUS "Installing dependency '${name}' (${config})")
+            message(STATUS "Installing dependency 'plugins/${name}' (${config})")
             configure_file("${file}" "${targetDir}/${name}" COPYONLY)
+        endif()
+        if("${cfg}" STREQUAL "DEBUG")
+            set(name "${plugin}${suffix}.pdb")
+            set(file "${path}/plugins/${name}")
+            if(EXISTS "${file}" AND NOT EXISTS "${targetDir}/${name}")
+                message(STATUS "Installing dependency 'plugins/${name}' (${config})")
+                configure_file("${file}" "${targetDir}/${name}" COPYONLY)
+            endif()
         endif()
     endforeach()
 endmacro()
@@ -42,12 +50,29 @@ macro(qt_install_library config targetDir lib)
         message(STATUS "Installing dependency '${name}' (${config})")
         configure_file("${file}" "${targetDir}/${name}" COPYONLY)
     endif()
-    if(WIN32 AND "${lib}" STREQUAL "Qt6::Gui")
-        qt_install_win32_plugins("${config}" "${targetDir}" "${file}"
-            imageformats/qico
-            imageformats/qjpeg
-            platforms/qwindows
-            )
+    if("${cfg}" STREQUAL "DEBUG")
+        string(REGEX REPLACE ".dll$" ".pdb" file "${file}")
+        get_filename_component(name "${file}" NAME)
+        if(EXISTS "${file}" AND NOT EXISTS "${targetDir}/${name}")
+            message(STATUS "Installing dependency '${name}' (${config})")
+            configure_file("${file}" "${targetDir}/${name}" COPYONLY)
+        endif()
+    endif()
+    if(WIN32)
+        if("${lib}" STREQUAL "Qt6::Gui")
+            qt_install_win32_plugins("${config}" "${targetDir}" "${file}"
+                imageformats/qico
+                imageformats/qjpeg
+                platforms/qwindows
+                )
+        endif()
+        if("${lib}" STREQUAL "Qt6::Network")
+            qt_install_win32_plugins("${config}" "${targetDir}" "${file}"
+                tls/qcertonlybackend
+                tls/qopensslbackend
+                tls/qschannelbackend
+                )
+        endif()
     endif()
 endmacro()
 

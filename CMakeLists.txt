@@ -11,7 +11,7 @@ set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 if(MSVC)
-    add_definitions(/GS- /Gy /GR-
+    add_definitions(/GS- /Gy /GR
         -D_CRT_SECURE_NO_DEPRECATE=1
         -D_CRT_SECURE_NO_WARNINGS=1
         -D_CRT_NONSTDC_NO_DEPRECATE=1
@@ -27,7 +27,7 @@ if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /INCREMENTAL:NO /LTCG /OPT:REF /OPT:ICF=20")
     set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} /INCREMENTAL:NO /LTCG /OPT:REF /OPT:ICF=20")
 elseif(WASM_TARGET)
-    add_definitions(-fno-rtti -fno-ident -fno-plt -fvisibility=hidden)
+    add_definitions(-fno-ident -fno-plt -fvisibility=hidden)
 else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-ident -fno-plt -fvisibility=hidden")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-ident -fno-plt -fvisibility=hidden")
@@ -38,7 +38,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-set(COMPONENTS_QT Core Gui Widgets WebSockets)
+set(COMPONENTS_QT Core Gui Widgets Network WebSockets)
 include(cmake/cute.cmake)
 include(cmake/libraries.cmake)
 
@@ -48,6 +48,7 @@ file(GLOB_RECURSE src
     "res/*"
     "src/*.cpp"
     "src/*.h"
+    "src/*.ui"
     )
 
 foreach(file ${src})

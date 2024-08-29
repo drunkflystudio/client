@@ -1,4 +1,5 @@
-#include <QMainWindow>
+#include "MainWindow.h"
+#include "Network/Server.h"
 #include <QApplication>
 #include <ctime>
 #include <cstdlib>
@@ -14,6 +15,14 @@ int main(int argc, char** argv)
 
     QApplication app(argc, argv);
     app.setStyle(QStringLiteral("Fusion"));
+    app.setStyleSheet(QStringLiteral(R"CSS(
+            QPushButton {
+                padding-top: 2px;
+                padding-bottom: 3px;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+        )CSS"));
 
   #ifndef WASM_TARGET
     QFont defaultFont = QApplication::font();
@@ -44,7 +53,10 @@ int main(int argc, char** argv)
     darkPalette.setColor(QPalette::Disabled, QPalette::HighlightedText, QColor(127, 127, 127));
     app.setPalette(darkPalette);
 
-    auto mainWindow = new QMainWindow();
+    auto server = new Server();
+    server->openConnection();
+
+    auto mainWindow = new MainWindow(server);
     mainWindow->show();
 
     return app.exec();
