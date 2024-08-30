@@ -55,7 +55,6 @@ int main(int argc, char** argv)
     app.setPalette(darkPalette);
 
     auto server = new Server();
-    server->openConnection();
 
     auto mainWindow = new MainWindow(server);
     mainWindow->show();

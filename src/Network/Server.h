@@ -13,6 +13,10 @@ public:
     explicit Server(QObject* parent = nullptr);
     ~Server() override;
 
+    bool isAuthenticated() const { return m_authenticated; }
+    bool isAuthenticating() const { return m_authenticating && !m_authenticated; }
+    void authenticate();
+
     bool isConnected() const { return m_connected; }
     bool isConnecting() const { return !m_connected && (m_reconnectTimer || m_socket); }
     bool isConnectionPending() const { return m_reconnectTimer; }
@@ -33,6 +37,8 @@ private:
     QString m_status;
     int m_statusTime;
     int m_reconnectWait;
+    bool m_authenticated;
+    bool m_authenticating;
     bool m_connected;
 
     void stopReconnectTimer();

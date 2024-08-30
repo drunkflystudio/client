@@ -12,6 +12,8 @@ Server::Server(QObject* parent)
     , m_status(tr("Offline"))
     , m_statusTime(-1)
     , m_reconnectWait(InitialReconnectWait)
+    , m_authenticated(false)
+    , m_authenticating(false)
     , m_connected(false)
 {
     m_updateTimer = new QTimer(this);
@@ -25,12 +27,32 @@ Server::~Server()
     closeConnection();
 }
 
+void Server::authenticate()
+{
+    // FIXME
+    m_authenticating = true;
+    emit stateChanged();
+
+    QTimer::singleShot(3000, [this]() {
+            m_authenticating = false;
+
+            m_authenticated = true;
+            m_reconnectWait = InitialReconnectWait;
+            openConnection();
+        });
+}
+
 void Server::openConnection()
 {
     if (m_socket)
         return;
 
     stopReconnectTimer();
+
+    if (m_authenticating || !m_authenticated) {
+        closeConnection();
+        return;
+    }
 
     m_socket = new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this);
     connect(m_socket, &QWebSocket::connected, this, &Server::onConnected);
@@ -130,6 +152,10 @@ void Server::onDisconnected()
     m_socket = nullptr;
 
     stopReconnectTimer();
+
+    if (!m_authenticated)
+        return;
+
     m_reconnectTimer = new QTimer(this);
     m_reconnectTimer->setSingleShot(true);
     m_reconnectTimer->callOnTimeout(this, &Server::openConnection);

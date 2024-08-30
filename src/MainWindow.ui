@@ -68,6 +68,7 @@
      </widget>
     </widget>
    </widget>
+   <widget class="AuthWidget" name="authWidget"/>
    <widget class="ConnectingWidget" name="connectingWidget"/>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -87,6 +88,12 @@
    <class>ConnectingWidget</class>
    <extends>QWidget</extends>
    <header>Network/ConnectingWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AuthWidget</class>
+   <extends>QWidget</extends>
+   <header>Network/AuthWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

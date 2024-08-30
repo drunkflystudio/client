@@ -15,9 +15,10 @@ public:
     explicit BreadcrumbsFrame(QWidget* parent = NULL);
     ~BreadcrumbsFrame() override;
 
-    Q_SIGNAL void pathClicked(const QString& path);
-
     void setPath(const QString& path);
+
+signals:
+    void pathClicked(const QString& path);
 
 private:
     QHBoxLayout* m_layout;

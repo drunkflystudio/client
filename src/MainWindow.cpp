@@ -13,6 +13,7 @@ MainWindow::MainWindow(Server* server, QWidget* parent)
 {
     m_ui.setupUi(this);
     m_ui.connectingWidget->setServer(m_server);
+    m_ui.authWidget->setServer(m_server);
     m_ui.assetBrowser->setServer(m_server);
     updateTitle();
 
@@ -36,5 +37,14 @@ void MainWindow::updateTitle()
 
 void MainWindow::onServerStateChanged()
 {
-    m_ui.centralWidget->setCurrentWidget(m_server->isConnected() ? (QWidget*)m_ui.contents : m_ui.connectingWidget);
+    QWidget* page = nullptr;
+
+    if (!m_server->isAuthenticated())
+        page = m_ui.authWidget;
+    else if (!m_server->isConnected())
+        page = m_ui.connectingWidget;
+    else
+        page = (QWidget*)m_ui.contents;
+
+    m_ui.centralWidget->setCurrentWidget(page);
 }
