@@ -80,8 +80,25 @@
      <height>33</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuProject">
+    <property name="title">
+     <string>&amp;Project</string>
+    </property>
+    <addaction name="actionLogout"/>
+   </widget>
+   <addaction name="menuProject"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionLogout">
+   <property name="icon">
+    <iconset>
+     <normalon>:/fatcow/FatCow_Icons32x32/door_in.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Log &amp;out...</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

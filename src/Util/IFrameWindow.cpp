@@ -17,7 +17,7 @@ void IFrameWindow::loadJS(const QString& url)
 {
     emscripten::val document = emscripten::val::global("document");
     emscripten::val script = document.call<emscripten::val>("createElement", std::string("script"));
-    script.set("https://accounts.google.com/gsi/intermediatesupport");
+    script.set("src", url.toStdString());
     document["head"].call<void>("appendChild", script);
 }
 
@@ -38,20 +38,20 @@ void IFrameWindow::setHtml(const QString& str)
              ch == '-' ||
              ch == '.' ||
              ch == '/')
-            ss << (char)ch;
+            ss << char(ch.unicode());
         else {
             static const char hex[] = "0123456789abcdef";
-            unsigned value = (unsigned)ch;
+            auto value = unsigned(ch.unicode());
             if (value > 31 && value < 127) {
                 ss << '%';
-                ss << hex[(ch >> 4) & 15];
-                ss << hex[ ch       & 15];
+                ss << hex[(value >> 4) & 15];
+                ss << hex[ value       & 15];
             } else {
                 ss << "%26%23x"; // &#x
-                ss << hex[ ch >> 12     ];
-                ss << hex[(ch >> 8) & 15];
-                ss << hex[(ch >> 4) & 15];
-                ss << hex[ ch       & 15];
+                ss << hex[ value >> 12     ];
+                ss << hex[(value >> 8) & 15];
+                ss << hex[(value >> 4) & 15];
+                ss << hex[ value       & 15];
                 ss << ';';
             }
         }
@@ -66,7 +66,7 @@ void IFrameWindow::resizeEvent(QResizeEvent* event)
     updateIFrameGeometry();
 }
 
-void IFrameWindow::moveEvent(QResizeEvent* event)
+void IFrameWindow::moveEvent(QMoveEvent* event)
 {
     QRasterWindow::moveEvent(event);
     updateIFrameGeometry();
@@ -98,7 +98,7 @@ void IFrameWindow::updateIFrameGeometry()
     emscripten::val rect = canvas.call<emscripten::val>("getBoundingClientRect");
 
     QPoint canvasPosition(rect["left"].as<int>(), rect["top"].as<int>());
-    QRect iframeGeometry(geom.topLeft() + canvasPoition, geom.size());
+    QRect iframeGeometry(geom.topLeft() + canvasPosition, geom.size());
 
     emscripten::val style = m_iframe["style"];
     style.set("left", QStringLiteral("%1px").arg(iframeGeometry.left()).toStdString());

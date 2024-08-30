@@ -39,10 +39,6 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 set(COMPONENTS_QT Core Gui Svg Widgets Network WebSockets)
-if(NOT WASM_TARGET)
-    list(APPEND COMPONENTS_QT NetworkAuth)
-endif()
-
 include(cmake/cute.cmake)
 include(cmake/libraries.cmake)
 

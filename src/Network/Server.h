@@ -16,58 +16,55 @@ class Server final : public QObject
     Q_OBJECT
 
 public:
+    enum StateID
+    {
+        Offline,
+        Authenticating,
+        Connecting,
+        Online,
+        WaitingReconnect,
+    };
+
+    class State : public QObject
+    {
+    public:
+        State(Server* server, StateID id) : m_server(server), m_id(id) {}
+        virtual ~State() = default;
+        virtual QString statusText() const = 0;
+        StateID id() const { return m_id; }
+    protected:
+        Server* const m_server;
+        StateID m_id;
+        Q_DISABLE_COPY_MOVE(State)
+    };
+
+    struct Auth
+    {
+        QString googleToken;
+    };
+
     explicit Server(QObject* parent = nullptr);
     ~Server() override;
 
-    bool isAuthenticated() const { return m_authenticated; }
-  #ifdef WASM_TARGET
-    bool isAuthenticating() const { return m_authFlow != nullptr; }
-  #else
-    bool isAuthenticating() const { return m_authFlow != nullptr; }
-  #endif
-    const QString& authError() const { return m_authError; }
+    State* state() const { return m_state; }
+    const QString& lastError() const { return m_lastError; }
+
     void authenticateWithGoogle();
-    void cancelAuthentication();
-
-    bool isConnected() const { return m_connected; }
-    bool isConnecting() const { return !m_connected && (m_reconnectTimer || m_socket); }
-    bool isConnectionPending() const { return m_reconnectTimer; }
-    const QString& statusText() const { return m_status; }
-
-    void openConnection();
-    void openNewConnection();
-    void closeConnection();
+    void reconnect();
+    void reconnectLater(const QString& error);
+    void abortConnection(const QString& error);
 
 signals:
     void stateChanged();
 
 private:
-    QWebSocket* m_socket;
-  #ifdef WASM_TARGET
-    IFrameWindow* m_authWindow;
-  #else
-    QOAuth2AuthorizationCodeFlow* m_authFlow;
-  #endif
-    QTimer* m_reconnectTimer;
-    QTimer* m_updateTimer;
-    QString m_error;
-    QString m_authError;
-    QString m_status;
-    int m_statusTime;
+    State* m_state;
+    QString m_lastError;
     int m_reconnectWait;
-    bool m_authenticated;
-    bool m_connected;
+    Auth m_auth;
 
-    void stopReconnectTimer();
-
-    void setAuthError(const QString& error);
-    void destroyAuthFlow();
-
-    void updateReconnectStatus();
-
-    void onConnected();
-    void onDisconnected();
-    void onTextMessageReceived(const QString& message);
+    void openConnection();
+    void setState(State* state);
 
     Q_DISABLE_COPY_MOVE(Server)
 };

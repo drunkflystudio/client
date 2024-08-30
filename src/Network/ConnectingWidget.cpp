@@ -20,11 +20,15 @@ void ConnectingWidget::setServer(Server* server)
 
 void ConnectingWidget::onServerStateChanged()
 {
-    m_ui.statusLabel->setText(m_server->statusText());
-    m_ui.reconnectNowButton->setVisible(m_server->isConnectionPending());
+    QString state = m_server->state()->statusText();
+    QString error = m_server->lastError();
+    if (!error.isEmpty())
+        state = QStringLiteral("<div style='color:red;font-weight:bold'>%1</div><br>%2").arg(error).arg(state);
+    m_ui.statusLabel->setText(state);
+    m_ui.reconnectNowButton->setVisible(m_server->state()->id() == Server::WaitingReconnect);
 }
 
 void ConnectingWidget::on_reconnectNowButton_clicked()
 {
-    m_server->openConnection();
+    m_server->reconnect();
 }

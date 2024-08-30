@@ -23,6 +23,8 @@ private:
 
     void onServerStateChanged();
 
+    Q_SLOT void on_actionLogout_triggered();
+
     Q_DISABLE_COPY_MOVE(MainWindow)
 };
 

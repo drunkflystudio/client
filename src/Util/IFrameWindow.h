@@ -2,7 +2,9 @@
 #define UTIL_IFRAMEWINDOW_H
 
 #ifdef WASM_TARGET
+#include <QRasterWindow>
 #include <emscripten.h>
+#include <emscripten/val.h>
 
 class IFrameWindow final : public QRasterWindow
 {
@@ -15,7 +17,7 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent* event) override;
-    void moveEvent(QResizeEvent* event) override;
+    void moveEvent(QMoveEvent* event) override;
 
 private:
     emscripten::val m_iframe;
