@@ -31,14 +31,18 @@ elseif(WASM_TARGET)
 else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-ident -fno-plt -fvisibility=hidden")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-ident -fno-plt -fvisibility=hidden")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s")
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s")
 endif()
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-set(COMPONENTS_QT Core Gui Widgets Network WebSockets)
+set(COMPONENTS_QT Core Gui Svg Widgets Network WebSockets)
+if(NOT WASM_TARGET)
+    list(APPEND COMPONENTS_QT NetworkAuth)
+endif()
+
 include(cmake/cute.cmake)
 include(cmake/libraries.cmake)
 

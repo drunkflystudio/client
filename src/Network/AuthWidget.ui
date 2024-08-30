@@ -31,6 +31,19 @@
     </spacer>
    </item>
    <item>
+    <widget class="QLabel" name="statusLabel">
+     <property name="text">
+      <string notr="true">[status]</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::TextFormat::RichText</enum>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="buttonLayout">
      <item>
       <spacer name="leftSpacer">
@@ -46,9 +59,37 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="loginButton">
+      <widget class="QPushButton" name="googleButton">
+       <property name="cursor">
+        <cursorShape>ArrowCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+background-color:#131314;
+border:1px solid #747775;
+color:#e3e3e3;
+height:30px;
+padding:0 12px;
+}
+QPushButton:hover {
+background-color:#232324;
+border:1px solid #949995;
+}</string>
+       </property>
        <property name="text">
-        <string>Login</string>
+        <string> Google</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normalon>:/google.svg</normalon>
+        </iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancelButton">
+       <property name="text">
+        <string>Cancel</string>
        </property>
       </widget>
      </item>
@@ -82,6 +123,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../res/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

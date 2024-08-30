@@ -5,6 +5,12 @@
 
 class QTimer;
 
+#ifdef WASM_TARGET
+class IFrameWindow;
+#else
+class QOAuth2AuthorizationCodeFlow;
+#endif
+
 class Server final : public QObject
 {
     Q_OBJECT
@@ -14,8 +20,14 @@ public:
     ~Server() override;
 
     bool isAuthenticated() const { return m_authenticated; }
-    bool isAuthenticating() const { return m_authenticating && !m_authenticated; }
-    void authenticate();
+  #ifdef WASM_TARGET
+    bool isAuthenticating() const { return m_authFlow != nullptr; }
+  #else
+    bool isAuthenticating() const { return m_authFlow != nullptr; }
+  #endif
+    const QString& authError() const { return m_authError; }
+    void authenticateWithGoogle();
+    void cancelAuthentication();
 
     bool isConnected() const { return m_connected; }
     bool isConnecting() const { return !m_connected && (m_reconnectTimer || m_socket); }
@@ -31,17 +43,25 @@ signals:
 
 private:
     QWebSocket* m_socket;
+  #ifdef WASM_TARGET
+    IFrameWindow* m_authWindow;
+  #else
+    QOAuth2AuthorizationCodeFlow* m_authFlow;
+  #endif
     QTimer* m_reconnectTimer;
     QTimer* m_updateTimer;
     QString m_error;
+    QString m_authError;
     QString m_status;
     int m_statusTime;
     int m_reconnectWait;
     bool m_authenticated;
-    bool m_authenticating;
     bool m_connected;
 
     void stopReconnectTimer();
+
+    void setAuthError(const QString& error);
+    void destroyAuthFlow();
 
     void updateReconnectStatus();
 

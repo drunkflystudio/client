@@ -25,7 +25,8 @@ private:
 
     void onServerStateChanged();
 
-    Q_SLOT void on_loginButton_clicked();
+    Q_SLOT void on_googleButton_clicked();
+    Q_SLOT void on_cancelButton_clicked();
 
     Q_DISABLE_COPY_MOVE(AuthWidget)
 };

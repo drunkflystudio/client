@@ -20,10 +20,27 @@ void AuthWidget::setServer(Server* server)
 
 void AuthWidget::onServerStateChanged()
 {
-    setEnabled(!m_server->isAuthenticating());
+    bool authenticating = m_server->isAuthenticating();
+    if (authenticating) {
+        m_ui.statusLabel->setVisible(true);
+        m_ui.statusLabel->setText(tr("Authenticating..."));
+    } else if (!m_server->authError().isEmpty()) {
+        m_ui.statusLabel->setVisible(true);
+        m_ui.statusLabel->setText(
+            QStringLiteral("<div style='color:red;font-weight:bold'>%1</div>").arg(m_server->authError()));
+    } else
+        m_ui.statusLabel->setVisible(false);
+
+    m_ui.googleButton->setVisible(!authenticating);
+    m_ui.cancelButton->setVisible(authenticating);
 }
 
-void AuthWidget::on_loginButton_clicked()
+void AuthWidget::on_googleButton_clicked()
 {
-    m_server->authenticate();
+    m_server->authenticateWithGoogle();
+}
+
+void AuthWidget::on_cancelButton_clicked()
+{
+    m_server->cancelAuthentication();
 }

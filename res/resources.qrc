@@ -1,5 +1,7 @@
 <RCC>
   <qresource>
+    <file>google.json</file>
+    <file>google.svg</file>
     <file>drunkfly.ico</file>
     <file>tango/32x32/actions/go-next.png</file>
     <file>tango/32x32/actions/go-previous.png</file>

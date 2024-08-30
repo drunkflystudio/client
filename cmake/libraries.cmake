@@ -63,6 +63,7 @@ macro(qt_install_library config targetDir lib)
             qt_install_win32_plugins("${config}" "${targetDir}" "${file}"
                 imageformats/qico
                 imageformats/qjpeg
+                imageformats/qsvg
                 platforms/qwindows
                 )
         endif()
