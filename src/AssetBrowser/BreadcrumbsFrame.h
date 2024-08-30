@@ -27,7 +27,7 @@ private:
 
     void onButtonClicked();
 
-    Q_DISABLE_COPY(BreadcrumbsFrame)
+    Q_DISABLE_COPY_MOVE(BreadcrumbsFrame)
 };
 
 #endif

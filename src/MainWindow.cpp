@@ -13,6 +13,7 @@ MainWindow::MainWindow(Server* server, QWidget* parent)
 {
     m_ui.setupUi(this);
     m_ui.connectingWidget->setServer(m_server);
+    m_ui.assetBrowser->setServer(m_server);
     updateTitle();
 
     onServerStateChanged();

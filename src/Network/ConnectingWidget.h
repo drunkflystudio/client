@@ -24,7 +24,7 @@ private:
 
     Q_SLOT void on_reconnectNowButton_clicked();
 
-    Q_DISABLE_COPY(ConnectingWidget)
+    Q_DISABLE_COPY_MOVE(ConnectingWidget)
 };
 
 #endif

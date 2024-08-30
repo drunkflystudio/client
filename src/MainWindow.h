@@ -23,7 +23,7 @@ private:
 
     void onServerStateChanged();
 
-    Q_DISABLE_COPY(MainWindow)
+    Q_DISABLE_COPY_MOVE(MainWindow)
 };
 
 #endif

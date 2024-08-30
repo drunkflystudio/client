@@ -43,7 +43,7 @@ private:
     void onDisconnected();
     void onTextMessageReceived(const QString& message);
 
-    Q_DISABLE_COPY(Server)
+    Q_DISABLE_COPY_MOVE(Server)
 };
 
 #endif

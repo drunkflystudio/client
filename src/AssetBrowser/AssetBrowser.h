@@ -5,6 +5,7 @@
 #include "ui_AssetBrowser.h"
 
 class Server;
+class AssetTreeModel;
 
 class AssetBrowser final : public QWidget
 {
@@ -19,8 +20,9 @@ public:
 private:
     Ui_AssetBrowser m_ui;
     Server* m_server;
+    AssetTreeModel* m_assetTreeModel;
 
-    Q_DISABLE_COPY(AssetBrowser)
+    Q_DISABLE_COPY_MOVE(AssetBrowser)
 };
 
 #endif
