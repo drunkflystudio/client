@@ -68,11 +68,11 @@ macro(qt_install_library config targetDir lib)
                 )
         endif()
         if("${lib}" STREQUAL "Qt6::Network")
-            qt_install_win32_plugins("${config}" "${targetDir}" "${file}"
-                tls/qopensslbackend
-                tls/qschannelbackend
-                )
+            if(MSVC)
+                qt_install_win32_plugins("${config}" "${targetDir}" "${file}" tls/qschannelbackend)
+            endif()
             if(MINGW)
+                qt_install_win32_plugins("${config}" "${targetDir}" "${file}" tls/qopensslbackend)
                 get_target_property(file "${lib}" LOCATION_${cfg})
                 get_filename_component(openssldir "${file}" DIRECTORY)
                 get_filename_component(openssldir "${openssldir}" DIRECTORY)

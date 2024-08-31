@@ -1,4 +1,3 @@
-#include <QDesktopServices>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QJsonObject>
@@ -23,7 +22,7 @@ public:
         connect(m_timer, &QTimer::timeout, this, &ServerAuthGoogleState::onTimer);
         m_timer->start(2000);
 
-        QDesktopServices::openUrl(QStringLiteral("https://auth.drunkfly.eu/google.php?cookie=%1").arg(m_cookie));
+        openUrl(QStringLiteral("https://auth.drunkfly.eu/google.php?cookie=%1").arg(m_cookie));
     }
 
     ~ServerAuthGoogleState() override

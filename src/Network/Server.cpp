@@ -1,8 +1,14 @@
 #include "Server.h"
+#include <QDesktopServices>
 
 const int InitialReconnectWait = 3000;
 const int MaxReconnectWait = 30000;
 const int ReconnectWaitGrowth = 2000;
+
+#ifdef WASM_TARGET
+#include <emscripten.h>
+#include <emscripten/val.h>
+#endif
 
 #include "ServerOfflineState.h"
 #include "ServerAuthGoogleState.h"
@@ -98,4 +104,19 @@ void Server::setState(State* state)
     m_state->deleteLater();
     m_state = state;
     emit stateChanged();
+}
+
+#ifdef WASM_TARGET
+EM_JS(void, JSShowPopup, (const char* url), {
+        window.open(UTF8ToString(url), "_blank", "popup=true,width=700,height=400");
+    });
+#endif
+
+void Server::State::openUrl(const QString& url)
+{
+  #ifdef WASM_TARGET
+    JSShowPopup(url.toUtf8().constData());
+  #else
+    QDesktopServices::openUrl(url);
+  #endif
 }
