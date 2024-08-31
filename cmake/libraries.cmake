@@ -69,10 +69,20 @@ macro(qt_install_library config targetDir lib)
         endif()
         if("${lib}" STREQUAL "Qt6::Network")
             qt_install_win32_plugins("${config}" "${targetDir}" "${file}"
-                tls/qcertonlybackend
                 tls/qopensslbackend
                 tls/qschannelbackend
                 )
+            if(MINGW)
+                get_target_property(file "${lib}" LOCATION_${cfg})
+                get_filename_component(openssldir "${file}" DIRECTORY)
+                get_filename_component(openssldir "${openssldir}" DIRECTORY)
+                get_filename_component(openssldir "${openssldir}" DIRECTORY)
+                get_filename_component(openssldir "${openssldir}" DIRECTORY)
+                set(openssldir "${openssldir}/OpenSSL/bin")
+                foreach(cryptolib libcrypto-3-x64 libssl-3-x64)
+                    install_library("${CMAKE_BUILD_TYPE}" "${targetDir}" "${openssldir}/${cryptolib}.dll")
+                endforeach()
+            endif()
         endif()
     endif()
 endmacro()
