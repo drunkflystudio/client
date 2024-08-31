@@ -31,6 +31,34 @@
     </spacer>
    </item>
    <item>
+    <widget class="QWidget" name="logoContainer" native="true">
+     <layout class="QHBoxLayout" name="logoLayout">
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="logo">
+        <property name="maximumSize">
+         <size>
+          <width>123</width>
+          <height>69</height>
+         </size>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../../res/resources.qrc">:/drunkfly.png</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="statusLabel">
      <property name="text">
       <string notr="true">[status]</string>
@@ -98,6 +126,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../res/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

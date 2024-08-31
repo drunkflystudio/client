@@ -1,5 +1,6 @@
 <RCC>
   <qresource>
+    <file>drunkfly.png</file>
     <file>fatcow/FatCow_Icons32x32/door_in.png</file>
     <file>google.json</file>
     <file>google.svg</file>

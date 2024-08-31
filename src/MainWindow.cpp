@@ -79,7 +79,7 @@ void MainWindow::on_actionLogout_triggered()
     connect(msgbox, &QMessageBox::done, msgbox, [msgbox](int r){ msgbox->deleteLater(); });
     connect(msgbox, &QMessageBox::buttonClicked, this, [this, logoutButton](QAbstractButton* button) {
             if (button == logoutButton)
-                m_server->abortConnection(QString());
+                m_server->abortConnectionAndLogout();
         });
     msgbox->show();
 }

@@ -1,5 +1,6 @@
 #include "Server.h"
 #include <QDesktopServices>
+#include <QSettings>
 
 const int InitialReconnectWait = 3000;
 const int MaxReconnectWait = 30000;
@@ -14,13 +15,27 @@ const int ReconnectWaitGrowth = 2000;
 #include "ServerAuthGoogleState.h"
 #include "ServerConnectingState.h"
 #include "ServerWaitingReconnectState.h"
+#include "ServerValidateSessionState.h"
 #include "ServerOnlineState.h"
 
 Server::Server(QObject* parent)
     : QObject(parent)
     , m_reconnectWait(InitialReconnectWait)
 {
-    m_state = new ServerOfflineState(this);
+    QSettings settings;
+    QString sessID = settings.value(QStringLiteral("sessID")).toString();
+    if (sessID.isEmpty())
+        m_state = new ServerOfflineState(this);
+    else {
+        m_state = new ServerValidateSessionState(this, sessID,
+            /*onSuccess:*/ [this, sessID] {
+                m_sessID = sessID;
+                openConnection();
+            },
+            /*onFailure:*/ [this] {
+                setState(new ServerOfflineState(this));
+            });
+    }
 }
 
 Server::~Server()
@@ -30,10 +45,13 @@ Server::~Server()
 void Server::authenticateWithGoogle()
 {
     m_lastError.clear();
-    m_auth = Auth();
+    m_sessID.clear();
     m_reconnectWait = InitialReconnectWait;
-    setState(new ServerAuthGoogleState(this, [this](const QString& token) {
-            m_auth.googleToken = token;
+    setState(new ServerAuthGoogleState(this, [this](const QString& sessID) {
+            m_sessID = sessID;
+            QSettings settings;
+            settings.setValue(QStringLiteral("sessID"), sessID);
+            settings.sync();
             openConnection();
         }));
 }
@@ -85,14 +103,22 @@ void Server::abortConnection(const QString& error)
 {
     m_lastError = error;
     m_reconnectWait = InitialReconnectWait;
-    m_auth = Auth();
+    m_sessID.clear();
     setState(new ServerOfflineState(this));
+}
+
+void Server::abortConnectionAndLogout()
+{
+    QSettings settings;
+    settings.remove(QStringLiteral("sessID"));
+    settings.sync();
+    abortConnection(QString());
 }
 
 void Server::openConnection()
 {
     m_lastError.clear();
-    setState(new ServerConnectingState(this, QStringLiteral("ws://127.0.0.1:8080/"), m_auth,
+    setState(new ServerConnectingState(this, QStringLiteral("ws://127.0.0.1:8080/"), m_sessID,
         [this](QWebSocket* socket) {
             m_reconnectWait = InitialReconnectWait;
             setState(new ServerOnlineState(this, socket));

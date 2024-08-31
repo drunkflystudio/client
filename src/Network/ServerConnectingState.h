@@ -6,10 +6,10 @@ class ServerConnectingState final : public Server::State
     Q_OBJECT
 
 public:
-    ServerConnectingState(Server* server, const QUrl& url, const Server::Auth& auth,
+    ServerConnectingState(Server* server, const QUrl& url, const QString& sessID,
             std::function<void(QWebSocket*)> onConnected)
         : State(server, Server::Connecting)
-        , m_auth(auth)
+        , m_sessID(sessID)
         , m_onConnected(onConnected)
         , m_ownSocket(true)
     {
@@ -32,14 +32,14 @@ public:
 
 private:
     QWebSocket* m_socket;
-    Server::Auth m_auth;
+    QString m_sessID;
     std::function<void(QWebSocket*)> m_onConnected;
     bool m_ownSocket;
 
     void onConnected()
     {
         // FIXME
-        m_socket->sendTextMessage(m_auth.googleToken);
+        //m_socket->sendTextMessage(m_auth.googleToken);
 
         m_ownSocket = false;
         m_socket->disconnect(this);

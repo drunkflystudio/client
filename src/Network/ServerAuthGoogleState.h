@@ -122,9 +122,8 @@ private:
             return;
         }
 
-        auto email = root[QStringLiteral("email")].toString().trimmed();
-        auto token = root[QStringLiteral("token")].toString().trimmed();
-        if (email.isEmpty() || token.isEmpty()) {
+        auto session = root[QStringLiteral("session")].toString().trimmed();
+        if (session.isEmpty()) {
             error(tr("Unable to parse response from the server."));
             return;
         }
@@ -132,7 +131,7 @@ private:
         if (m_state != Error && m_state != Finished) {
             m_state = Finished;
             if (m_server->state() == this)
-                m_onSuccess(token);
+                m_onSuccess(session);
         }
     }
 

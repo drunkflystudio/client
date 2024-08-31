@@ -40,11 +40,6 @@ public:
         Q_DISABLE_COPY_MOVE(State)
     };
 
-    struct Auth
-    {
-        QString googleToken;
-    };
-
     explicit Server(QObject* parent = nullptr);
     ~Server() override;
 
@@ -55,6 +50,7 @@ public:
     void reconnect();
     void reconnectLater(const QString& error);
     void abortConnection(const QString& error);
+    void abortConnectionAndLogout();
 
 signals:
     void stateChanged();
@@ -62,8 +58,8 @@ signals:
 private:
     State* m_state;
     QString m_lastError;
+    QString m_sessID;
     int m_reconnectWait;
-    Auth m_auth;
 
     void openConnection();
     void setState(State* state);
