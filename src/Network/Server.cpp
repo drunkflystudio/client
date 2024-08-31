@@ -107,18 +107,18 @@ void Server::abortConnection(const QString& error)
     setState(new ServerOfflineState(this));
 }
 
-void Server::abortConnectionAndLogout()
+void Server::abortConnectionAndLogout(const QString& error)
 {
     QSettings settings;
     settings.remove(QStringLiteral("sessID"));
     settings.sync();
-    abortConnection(QString());
+    abortConnection(error);
 }
 
 void Server::openConnection()
 {
     m_lastError.clear();
-    setState(new ServerConnectingState(this, QStringLiteral("ws://127.0.0.1:8080/"), m_sessID,
+    setState(new ServerConnectingState(this, m_sessID,
         [this](QWebSocket* socket) {
             m_reconnectWait = InitialReconnectWait;
             setState(new ServerOnlineState(this, socket));

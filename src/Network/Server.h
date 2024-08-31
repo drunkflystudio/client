@@ -50,7 +50,7 @@ public:
     void reconnect();
     void reconnectLater(const QString& error);
     void abortConnection(const QString& error);
-    void abortConnectionAndLogout();
+    void abortConnectionAndLogout(const QString& error = QString());
 
 signals:
     void stateChanged();
