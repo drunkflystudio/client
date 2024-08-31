@@ -17,7 +17,7 @@ public:
         , m_callbackCalled(false)
     {
         m_query = new QNetworkAccessManager(this);
-        m_request.setUrl(QStringLiteral("https://auth.drunkfly.eu/get_session.php?id=%1").arg(sessID));
+        m_request.setUrl(QStringLiteral("https://auth.drunkfly.eu/session_get.php?id=%1").arg(sessID));
         m_reply = m_query->get(m_request);
         connect(m_reply, &QNetworkReply::finished, this, &ServerValidateSessionState::onResponseReceived);
         connect(m_reply, &QNetworkReply::errorOccurred, this, &ServerValidateSessionState::onError);

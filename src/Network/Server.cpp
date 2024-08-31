@@ -112,6 +112,16 @@ void Server::abortConnectionAndLogout(const QString& error)
     QSettings settings;
     settings.remove(QStringLiteral("sessID"));
     settings.sync();
+
+    QNetworkRequest request;
+    request.setUrl(QStringLiteral("https://auth.drunkfly.eu/session_kill.php?id=%1").arg(m_sessID));
+    auto query = new QNetworkAccessManager(this);
+    auto reply = query->get(request);
+    connect(reply, &QNetworkReply::finished, this, [query, reply] {
+            query->deleteLater();
+            reply->deleteLater();
+        });
+
     abortConnection(error);
 }
 
