@@ -12,12 +12,14 @@ public:
     explicit ServerAuthGoogleState(Server* server, std::function<void(const QString&)> onSuccess)
         : State(server, Server::Authenticating)
         , m_onSuccess(onSuccess)
-        , m_state(WaitingCookieState)
+        , m_state(WaitingHeaders)
     {
         m_query = new QNetworkAccessManager(this);
         m_request.setUrl(QStringLiteral("https://auth.drunkfly.eu/google_status.php"));
         m_reply = m_query->get(m_request);
-        connect(m_reply, &QNetworkReply::readyRead, this, &ServerAuthGoogleState::onResponseReceived);
+        connect(m_reply, &QNetworkReply::metaDataChanged, this, &ServerAuthGoogleState::onHeadersReceived);
+        connect(m_reply, &QNetworkReply::finished, this, &ServerAuthGoogleState::onResponseReceived);
+        connect(m_reply, &QNetworkReply::errorOccurred, this, &ServerAuthGoogleState::onError);
     }
 
     ~ServerAuthGoogleState() override
@@ -29,15 +31,19 @@ public:
 
     QString statusText() const override
     {
-        return tr("Authenticating with Google...");
+        switch (m_state) {
+            case WaitingHeaders: return tr("Requesting authentication cookie...");
+            case Finished: case Error: return tr("Finalizing...");
+            default: return tr("Waiting for user action...");
+        }
     }
 
 private:
     enum AuthState
     {
         Error,
-        WaitingCookieState,
-        WaitingAuth,
+        WaitingHeaders,
+        WaitingResponse,
         Finished,
     };
 
@@ -45,78 +51,52 @@ private:
     QNetworkReply* m_reply;
     QNetworkRequest m_request;
     QString m_cookie;
-    QByteArray m_buffer;
     std::function<void(const QString&)> m_onSuccess;
     AuthState m_state;
 
     void error(const QString& message)
     {
-        m_state = Error;
-        if (m_server->state() == this)
-            m_server->abortConnection(message);
+        if (m_state != Error && m_state != Finished) {
+            m_state = Error;
+            if (m_server->state() == this)
+                m_server->abortConnection(message);
+        }
+    }
+
+    void onError(const QNetworkReply::NetworkError code)
+    {
+        error(tr("Authentication failed: %1").arg(m_reply->errorString()));
+    }
+
+    void onHeadersReceived()
+    {
+        if (m_state != WaitingHeaders)
+            return;
+
+        auto header = m_reply->rawHeader("Content-Type");
+        int index = header.indexOf("cookie=");
+        if (index < 0) {
+            error(tr("Invalid response from the server."));
+            return;
+        }
+        index += 7;
+        m_cookie = QString::fromLatin1(header.mid(index, header.length() - index).constData());
+
+        openUrl(QStringLiteral("https://auth.drunkfly.eu/google.php?cookie=%1").arg(m_cookie));
+
+        m_state = WaitingResponse;
+        if (m_server)
+            emit m_server->stateChanged();
     }
 
     void onResponseReceived()
     {
-        for (;;) {
-            if (m_reply->error() != QNetworkReply::NoError) {
-                error(tr("Authentication failed: %1").arg(m_reply->errorString()));
-                return;
-            }
-
-            qint64 bytesAvailable = m_reply->bytesAvailable();
-            if (bytesAvailable <= 0)
-                break;
-
-            m_buffer += m_reply->read(bytesAvailable);
-        }
-
-        switch (m_state) {
-            case WaitingCookieState: {
-                int index = m_buffer.indexOf('~');
-                if (index < 0)
-                    return;
-                QByteArray json = m_buffer;
-                if (index == json.length() - 1) {
-                    m_buffer = QByteArray();
-                    json.removeLast();
-                } else {
-                    m_buffer.remove(0, index);
-                    json.remove(index - 1, m_buffer.length() - index + 1);
-                }
-                onCookieReceived(json);
-                break;
-            }
-
-            case WaitingAuth: {
-                if (m_reply->atEnd())
-                    onResultReceived(m_buffer);
-                break;
-            }
-        }
-    }
-
-    void onCookieReceived(const QByteArray& json)
-    {
-        auto doc = QJsonDocument::fromJson(json, nullptr);
-        if (doc.isNull()) {
-            error(tr("Unable to parse response from the server."));
+        if (m_reply->error() != QNetworkReply::NoError) {
+            error(tr("Authentication failed: %1").arg(m_reply->errorString()));
             return;
         }
 
-        auto root = doc.object();
-        m_cookie = root[QStringLiteral("cookie")].toString().trimmed();
-        if (m_cookie.isEmpty()) {
-            error(tr("Unable to parse response from the server."));
-            return;
-        }
-
-        m_state = WaitingAuth;
-        openUrl(QStringLiteral("https://auth.drunkfly.eu/google.php?cookie=%1").arg(m_cookie));
-    }
-
-    void onResultReceived(const QByteArray& json)
-    {
+        auto json = m_reply->readAll();
         auto doc = QJsonDocument::fromJson(json, nullptr);
         if (doc.isNull()) {
             error(tr("Unable to parse response from the server."));
@@ -149,9 +129,11 @@ private:
             return;
         }
 
-        m_state = Finished;
-        if (m_server->state() == this)
-            m_onSuccess(token);
+        if (m_state != Error && m_state != Finished) {
+            m_state = Finished;
+            if (m_server->state() == this)
+                m_onSuccess(token);
+        }
     }
 
     Q_DISABLE_COPY_MOVE(ServerAuthGoogleState)

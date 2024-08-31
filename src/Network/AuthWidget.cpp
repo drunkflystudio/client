@@ -23,7 +23,7 @@ void AuthWidget::onServerStateChanged()
     bool authenticating = m_server->state()->id() == Server::Authenticating;
     if (authenticating) {
         m_ui.statusLabel->setVisible(true);
-        m_ui.statusLabel->setText(tr("Authenticating..."));
+        m_ui.statusLabel->setText(m_server->state()->statusText());
     } else if (!m_server->lastError().isEmpty()) {
         m_ui.statusLabel->setVisible(true);
         m_ui.statusLabel->setText(
