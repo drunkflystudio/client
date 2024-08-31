@@ -107,8 +107,18 @@ void Server::setState(State* state)
 }
 
 #ifdef WASM_TARGET
+EM_JS(void, JSHidePopup, (), {
+        if (window.drunkflyAuthPopup) {
+            try { window.drunkflyAuthPopup.close(); } catch (e) { console.error(e); }
+            window.drunkflyAuthPopup = null;
+        }
+    });
 EM_JS(void, JSShowPopup, (const char* url), {
-        window.open(UTF8ToString(url), "_blank", "popup=true,width=700,height=400");
+        if (window.drunkflyAuthPopup) {
+            try { window.drunkflyAuthPopup.close(); } catch (e) { console.error(e); }
+            window.drunkflyAuthPopup = null;
+        }
+        window.drunkflyAuthPopup = window.open(UTF8ToString(url), "DrunkFlyAuth", "popup=true,width=700,height=400");
     });
 #endif
 
@@ -118,5 +128,12 @@ void Server::State::openUrl(const QString& url)
     JSShowPopup(url.toUtf8().constData());
   #else
     QDesktopServices::openUrl(url);
+  #endif
+}
+
+void Server::State::closeUrl()
+{
+  #ifdef WASM_TARGET
+    JSHidePopup();
   #endif
 }

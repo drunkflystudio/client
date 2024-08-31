@@ -36,6 +36,7 @@ public:
         Server* const m_server;
         StateID m_id;
         void openUrl(const QString& url);
+        void closeUrl();
         Q_DISABLE_COPY_MOVE(State)
     };
 

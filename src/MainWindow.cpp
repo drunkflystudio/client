@@ -76,7 +76,7 @@ void MainWindow::on_actionLogout_triggered()
             if (server->state()->id() != Server::Online)
                 msgbox->reject();
         });
-    connect(msgbox, &QMessageBox::done, msgbox, &QMessageBox::deleteLater);
+    connect(msgbox, &QMessageBox::done, msgbox, [msgbox](int r){ msgbox->deleteLater(); });
     connect(msgbox, &QMessageBox::buttonClicked, this, [this, logoutButton](QAbstractButton* button) {
             if (button == logoutButton)
                 m_server->abortConnection(QString());
