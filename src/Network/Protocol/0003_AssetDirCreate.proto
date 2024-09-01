@@ -1,0 +1,13 @@
+syntax = "proto3";
+package Protobuf;
+
+message NetAssetDirCreate
+{
+    message Response
+    {
+        bool success = 1;
+    }
+
+    enum ID { _zero = 0; Value = 3; }
+    string name = 1;
+}

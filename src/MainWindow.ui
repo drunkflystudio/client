@@ -80,13 +80,13 @@
      <height>33</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuProject">
+   <widget class="QMenu" name="menuStudio">
     <property name="title">
-     <string>&amp;Project</string>
+     <string>&amp;Studio</string>
     </property>
     <addaction name="actionLogout"/>
    </widget>
-   <addaction name="menuProject"/>
+   <addaction name="menuStudio"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionLogout">
@@ -96,7 +96,7 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Log &amp;out...</string>
+    <string>Log &amp;out</string>
    </property>
   </action>
  </widget>

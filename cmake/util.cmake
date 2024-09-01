@@ -1,0 +1,13 @@
+
+macro(maybe_write_file file contents)
+    set(do_write TRUE)
+    if(EXISTS "${file}")
+        file(READ "${file}" old)
+        if("${old}" STREQUAL "${contents}")
+            set(do_write FALSE)
+        endif()
+    endif()
+    if(do_write)
+        file(WRITE "${file}" "${contents}")
+    endif()
+endmacro()

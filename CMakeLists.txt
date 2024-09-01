@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 project(Studio)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set_property(GLOBAL PROPERTY AUTOGEN_SOURCE_GROUP "Generated Files")
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMake")
+set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER "CMake")
+set_property(GLOBAL PROPERTY AUTOGEN_SOURCE_GROUP "Generated Files")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
@@ -38,9 +39,16 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-set(COMPONENTS_QT Core Gui Svg Widgets Network WebSockets)
+set(COMPONENTS_QT Core Gui Svg Widgets Network WebSockets Protobuf)
 include(cmake/cute.cmake)
 include(cmake/libraries.cmake)
+include(cmake/util.cmake)
+
+file(GLOB_RECURSE proto
+    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+    CONFIGURE_DEPENDS
+    "src/Network/Protocol/*.proto"
+    )
 
 file(GLOB_RECURSE src
      RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -51,7 +59,7 @@ file(GLOB_RECURSE src
     "src/*.ui"
     )
 
-foreach(file ${src})
+foreach(file ${src} ${proto})
     get_filename_component(dir "${file}" DIRECTORY)
     string(REGEX REPLACE "^src" "Source Files" group "${dir}")
     string(REGEX REPLACE "^res" "Resource Files" group "${group}")
@@ -71,5 +79,24 @@ else()
     mingw_install_libraries("${build_dir}")
 endif()
 
-target_sources(Studio PRIVATE ${src})
+target_sources(Studio PRIVATE ${src} ${proto})
 target_include_directories(Studio PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
+qt_add_protobuf(Studio
+    GENERATE_PACKAGE_SUBFOLDERS
+    OUTPUT_HEADERS headers
+    PROTO_FILES ${proto}
+    )
+set(unicxxfile "${CMAKE_CURRENT_BINARY_DIR}/protobuf_generated.cpp")
+set(unicxx "")
+foreach(hdr ${headers})
+    get_filename_component(dir "${hdr}" DIRECTORY)
+    get_filename_component(name "${hdr}" NAME_WE)
+    set(cxx_file "${dir}/${name}.qpb.cpp")
+    set(reg_file "${dir}/${name}_protobuftyperegistrations.cpp")
+    set_source_files_properties("${cxx_file}" "${reg_file}" PROPERTIES HEADER_FILE_ONLY TRUE)
+    set(unicxx "${unicxx}#include \"${cxx_file}\"\n#include \"${reg_file}\"\n")
+endforeach()
+maybe_write_file("${unicxxfile}" "${unicxx}")
+source_group("Generated Files" FILES "${unicxxfile}")
+target_sources(Studio PRIVATE "${unicxxfile}")
