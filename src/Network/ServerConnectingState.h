@@ -1,3 +1,4 @@
+#include "Protobuf/_Packet.qpb.h"
 #include <QWebSocket>
 #include <QTimer>
 #include <functional>
@@ -46,17 +47,27 @@ private:
         m_socket->disconnect(this);
         m_timer->stop();
 
-        qDebug("[%s]\n", qPrintable(message));
+        if (message.startsWith(QStringLiteral("PROTOv"))) {
+            int version = message.mid(6, message.length() - 6).toInt();
+            if (version != Protobuf::NetConstantsGadget::ProtocolVersion) {
+                if (m_server->state() == this) {
+                    m_server->abortConnectionAndLogout(
+                        tr("Server uses unsupported protocol version %1 (expected version %2). Please update your client software.")
+                        .arg(version).arg(Protobuf::NetConstantsGadget::ProtocolVersion));
+                }
+                return;
+            }
 
-        if (message == QStringLiteral("Welcome!")) {
             if (m_server->state() == this)
                 m_onConnected(m_socket);
             else
                 m_socket->deleteLater();
-        } else {
-            if (m_server->state() == this)
-                m_server->abortConnectionAndLogout(tr("Session expired, please login again."));
+
+            return;
         }
+
+        if (m_server->state() == this)
+            m_server->abortConnectionAndLogout(tr("Session expired, please login again."));
     }
 
     void onTimeout()
