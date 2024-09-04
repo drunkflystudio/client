@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "Network/ConnectingWidget.h"
 #include "Network/Server.h"
+#include <QSettings>
 #include <QMessageBox>
 
 #ifdef WASM_TARGET
@@ -11,10 +12,17 @@ EM_JS(void, JSSetDocumentTitle, (const char* title), { document.title = UTF8ToSt
 MainWindow::MainWindow(Server* server, QWidget* parent)
     : QMainWindow(parent)
     , m_server(server)
+    , m_projectSelection(false)
 {
+    QSettings settings;
+    m_currentProject = settings.value(QStringLiteral("currentProject")).toUuid();
+    if (m_currentProject.isNull())
+        m_projectSelection = true;
+
     m_ui.setupUi(this);
     m_ui.connectingWidget->setServer(m_server);
     m_ui.authWidget->setServer(m_server);
+    m_ui.projectSelectorWidget->setServer(m_server);
     m_ui.assetBrowser->setServer(m_server);
     updateTitle();
 
@@ -49,13 +57,32 @@ void MainWindow::onServerStateChanged()
             page = m_ui.connectingWidget;
             break;
         case Server::Online:
-            page = (QWidget*)m_ui.contents;
+            if (m_projectSelection)
+                page = m_ui.projectSelectorWidget;
+            else
+                page = (QWidget*)m_ui.contents;
             break;
     }
+
+    m_ui.actionNewProject->setVisible(!m_projectSelection);
+    m_ui.actionOpenProject->setVisible(!m_projectSelection);
 
     m_ui.menuBar->setVisible(m_server->state()->id() == Server::Online);
     m_ui.statusBar->setVisible(m_server->state()->id() == Server::Online);
     m_ui.centralWidget->setCurrentWidget(page);
+}
+
+void MainWindow::on_actionNewProject_triggered()
+{
+    m_projectSelection = true;
+    onServerStateChanged();
+    m_ui.projectSelectorWidget->on_createButton_triggered();
+}
+
+void MainWindow::on_actionOpenProject_triggered()
+{
+    m_projectSelection = true;
+    onServerStateChanged();
 }
 
 void MainWindow::on_actionLogout_triggered()

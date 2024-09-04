@@ -70,6 +70,7 @@
    </widget>
    <widget class="AuthWidget" name="authWidget"/>
    <widget class="ConnectingWidget" name="connectingWidget"/>
+   <widget class="ProjectSelectorWidget" name="projectSelectorWidget"/>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -84,6 +85,9 @@
     <property name="title">
      <string>&amp;Studio</string>
     </property>
+    <addaction name="actionNewProject"/>
+    <addaction name="actionOpenProject"/>
+    <addaction name="separator"/>
     <addaction name="actionLogout"/>
    </widget>
    <addaction name="menuStudio"/>
@@ -97,6 +101,26 @@
    </property>
    <property name="text">
     <string>Log &amp;out</string>
+   </property>
+  </action>
+  <action name="actionOpenProject">
+   <property name="icon">
+    <iconset>
+     <normalon>:/fatcow/FatCow_Icons32x32/folder_explorer.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Open &amp;project...</string>
+   </property>
+  </action>
+  <action name="actionNewProject">
+   <property name="icon">
+    <iconset>
+     <normalon>:/fatcow/FatCow_Icons32x32/folder_page.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Ne&amp;w project...</string>
    </property>
   </action>
  </widget>
@@ -117,6 +141,12 @@
    <class>AssetBrowser</class>
    <extends>QWidget</extends>
    <header>AssetBrowser/AssetBrowser.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ProjectSelectorWidget</class>
+   <extends>QWidget</extends>
+   <header>Project/ProjectSelectorWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -1,5 +1,7 @@
 <RCC>
   <qresource>
+    <file>fatcow/FatCow_Icons32x32/folder_page.png</file>
+    <file>fatcow/FatCow_Icons32x32/folder_explorer.png</file>
     <file>drunkfly.png</file>
     <file>fatcow/FatCow_Icons32x32/door_in.png</file>
     <file>google.json</file>
