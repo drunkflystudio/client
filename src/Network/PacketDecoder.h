@@ -4,9 +4,12 @@
 #include <QProtobufSerializer>
 #include <new>
 
+template <typename T> constexpr int ProtobufMsgID();
+
 struct IPacketDecoder
 {
     virtual ~IPacketDecoder() = default;
+    virtual int msgID() const = 0;
     virtual size_t packetSize() const = 0;
     virtual bool decode(QProtobufSerializer& serializer, void* dst, const QByteArray& data) const = 0;
     virtual void freePacket(void* dst) const = 0;
@@ -21,6 +24,11 @@ public:
     static const PacketDecoder* instance()
     {
         return &m_instance;
+    }
+
+    int msgID() const override
+    {
+        return ProtobufMsgID<T>();
     }
 
     size_t packetSize() const override

@@ -1,4 +1,4 @@
-#include "Connection.h"
+#include "Network/Connection.h"
 #include <QWebSocket>
 
 class Connection;

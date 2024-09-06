@@ -1,13 +1,17 @@
 syntax = "proto3";
 package Protobuf;
 
-message NetAssetDirCreate
+message Project
+{
+    string name = 1;
+}
+
+message CreateProject
 {
     message Response
     {
-        bool success = 1;
+        string uuid = 2;
     }
 
-    enum ID { _zero = 0; Value = 3; }
     string name = 1;
 }

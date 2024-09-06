@@ -1,4 +1,4 @@
-#include "Protobuf/_Packet.qpb.h"
+#include "Network/Protocol.h"
 #include <QWebSocket>
 #include <QTimer>
 #include <functional>
@@ -49,11 +49,11 @@ private:
 
         if (message.startsWith(QStringLiteral("PROTOv"))) {
             int version = message.mid(6, message.length() - 6).toInt();
-            if (version != Protobuf::NetConstantsGadget::ProtocolVersion) {
+            if (version != Protobuf::ConstantsGadget::ProtocolVersion) {
                 if (m_server->state() == this) {
                     m_server->abortConnectionAndLogout(
                         tr("Server uses unsupported protocol version %1 (expected version %2). Please update your client software.")
-                        .arg(version).arg(Protobuf::NetConstantsGadget::ProtocolVersion));
+                        .arg(version).arg(Protobuf::ConstantsGadget::ProtocolVersion));
                 }
                 return;
             }

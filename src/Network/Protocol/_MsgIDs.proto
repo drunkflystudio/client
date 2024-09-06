@@ -1,0 +1,11 @@
+/* THIS IS AN AUTOMATICALLY GENERATED FILE. DO NOT CHANGE. */
+syntax = "proto3";
+package Protobuf;
+
+enum MsgID
+{
+    InvalidMsgID = 0;
+    MsgID_CreateProject = 2;
+    MsgID_CreateProject_Response = 3;
+    MsgID_Project = 1;
+}

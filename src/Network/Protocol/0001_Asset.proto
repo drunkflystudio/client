@@ -1,8 +1,0 @@
-syntax = "proto3";
-package Protobuf;
-
-message NetAsset
-{
-    enum ID { _zero = 0; Value = 1; }
-    string name = 1;
-}

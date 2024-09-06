@@ -1,14 +1,13 @@
 syntax = "proto3";
 package Protobuf;
 
-enum NetConstants
+enum Constants
 {
     _zero = 0;
-    ProtocolVersion = 100;
-    ProtocolResponseIdMultiplier = 1000;
-};
+    ProtocolVersion = 101;
+}
 
-message NetPacket
+message Packet
 {
     sint64 seq = 1;
     sint32 msgID = 2;

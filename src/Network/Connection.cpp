@@ -1,5 +1,5 @@
 #include "Connection.h"
-#include "Protobuf/_Packet.qpb.h"
+#include "Network/Protocol.h"
 #include <QWebSocket>
 
 const int REQUEST_TIMEOUT = 1000;
@@ -19,7 +19,7 @@ Connection::~Connection()
 
 void Connection::sendPacket(int msgID, const QByteArray& data)
 {
-    Protobuf::NetPacket packet;
+    Protobuf::Packet packet;
     packet.setSeq(0);
     packet.setMsgID(msgID);
     packet.setPayload(data);
@@ -42,7 +42,7 @@ void Connection::sendPacketWithCB(int msgID, const QByteArray& data,
     connect(timer, &QTimer::timeout, this, [this, seq]{ onResponseReceived(seq, nullptr); });
     timer->start(REQUEST_TIMEOUT);
 
-    Protobuf::NetPacket packet;
+    Protobuf::Packet packet;
     packet.setSeq(seq);
     packet.setMsgID(msgID);
     packet.setPayload(data);
@@ -96,7 +96,7 @@ bool Connection::unregisterListener(int msgID, QObject* r)
 
 void Connection::onMessageReceived(const QByteArray& data)
 {
-    Protobuf::NetPacket packet;
+    Protobuf::Packet packet;
     packet.deserialize(&m_serializer, data);
     if (m_serializer.deserializationError() != QAbstractProtobufSerializer::NoError) {
         qWarning("Unable to parse server message.");
@@ -150,7 +150,7 @@ void Connection::onMessageReceived(const QByteArray& data)
     listeners.decoder->freePacket(buf);
 }
 
-void Connection::onResponseReceived(qint64 seq, const Protobuf::NetPacket* packet)
+void Connection::onResponseReceived(qint64 seq, const Protobuf::Packet* packet)
 {
     auto it = m_pendingCallbacks.find(seq);
     if (it == m_pendingCallbacks.end()) {
@@ -183,7 +183,7 @@ void Connection::onResponseReceived(qint64 seq, const Protobuf::NetPacket* packe
         return;
     }
 
-    int expectedID = cb.msgID * Protobuf::NetConstantsGadget::ProtocolResponseIdMultiplier;
+    int expectedID = cb.decoder->msgID();
     if (packet->msgID() != expectedID) {
         qWarning("Server has sent an unexpected response (reqID %d, respID %ld (expected %d), seq %ld)",
             cb.msgID, long(packet->msgID()), expectedID, long(seq));

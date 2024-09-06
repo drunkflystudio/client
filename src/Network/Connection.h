@@ -11,7 +11,9 @@
 #include <functional>
 
 class QWebSocket;
-namespace Protobuf { class NetPacket; };
+
+namespace Protobuf { class Packet; };
+template <typename T> constexpr int ProtobufMsgID();
 
 class Connection final : public QObject
 {
@@ -43,17 +45,17 @@ public:
     ~Connection() override;
 
     template <typename T> void send(const T& data)
-        { sendPacket(T::ID::Value, data.serialize(&m_serializer)); }
+        { sendPacket(ProtobufMsgID<T>(), data.serialize(&m_serializer)); }
     template <typename T> void send(const T& data, QObject* r, std::function<void(const typename T::Response*)> cb)
-        { sendPacketWithCB(T::ID::Value, data.serialize(&m_serializer), r,
+        { sendPacketWithCB(ProtobufMsgID<T>(), data.serialize(&m_serializer), r,
             PacketDecoder<typename T::Response>::instance(),
             [this, cb](const void* data) { cb(reinterpret_cast<const typename T::Response*>(data)); }); }
 
     template <typename T> void addListener(QObject* receiver, std::function<void(const T&)> cb)
-        { registerListener(T::ID::Value, receiver, PacketDecoder<T>::instance(),
+        { registerListener(ProtobufMsgID<T>(), receiver, PacketDecoder<T>::instance(),
             [this, cb](const void* data){ cb(*reinterpret_cast<const T*>(data)); }); }
     template <typename T> void removeListener(QObject* receiver)
-        { unregisterListener(T::ID::Value, receiver); }
+        { unregisterListener(ProtobufMsgID<T>(), receiver); }
 
 signals:
     void onProtocolError();
@@ -77,7 +79,7 @@ private:
     bool unregisterListener(int msgID, QObject* r);
 
     void onMessageReceived(const QByteArray& data);
-    void onResponseReceived(qint64 seq, const Protobuf::NetPacket* packet);
+    void onResponseReceived(qint64 seq, const Protobuf::Packet* packet);
 
     Q_DISABLE_COPY_MOVE(Connection)
 };
