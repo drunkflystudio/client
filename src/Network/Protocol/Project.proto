@@ -3,14 +3,20 @@ package Protobuf;
 
 message Project
 {
-    string name = 1;
+    sint32 id = 1;
+    string name = 2;
+    sint32 creatorId = 3;
+    string creatorName = 4;
+    string created = 5;
+    string lastAccessed = 6;
+    bool archived = 7;
 }
 
 message CreateProject
 {
     message Response
     {
-        string uuid = 2;
+        sint32 id = 1;
     }
 
     string name = 1;
